@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Script to use a REST API for a given employee ID, returns
-information about his/her TODO list progress"""
+information about his/her TODO list progress and export in CSV"""
+import csv
 import requests
 import sys
 
@@ -23,12 +24,11 @@ if __name__ == "__main__":
         print("RequestError:", 404)
         sys.exit(1)
 
-    employee_name = data[0]["user"]["name"]
-    total_tasks = len(data)
-    done_tasks = [task for task in data if task["completed"]]
-    total_done_tasks = len(done_tasks)
+    username = data[0]["user"]["username"]
 
-    print(f"Employee {employee_name} is done with tasks"
-          f"({total_done_tasks}/{total_tasks}):")
-    for task in done_tasks:
-        print(f"\t {task['title']}")
+    with open(f"{EMPLOYEE_ID}.csv", "w", newline="") as file:
+        writer = csv.writer(file, quoting=csv.QUOTE_NONNUMERIC)
+        for task in data:
+            writer.writerow(
+                [EMPLOYEE_ID, username, str(task["completed"]), task["title"]]
+            )
